@@ -166,4 +166,22 @@ if prompt := st.chat_input("Ask me anything about clothing, fashion, or outfits.
                 raw_response = response.json()['choices'][0]['message']['content']
 
                 for chunk in raw_response.split():
-                
+                    full_response += chunk + " "
+                    response_placeholder.markdown(f"<div class='stChatMessage'>{full_response}▌</div>", unsafe_allow_html=True)
+                    time.sleep(0.03)
+                    response_placeholder.markdown(f"<div class='stChatMessage'>{full_response}</div>", unsafe_allow_html=True)
+                    break
+
+            except requests.exceptions.RequestException as e:
+                logging.error(f"Network Error: {str(e)}")
+                response_placeholder.error(f"🌐 Network Error: {str(e)}")
+                full_response = "Error: Connection issue - try again later"
+                break
+
+            except Exception as e:
+                logging.error(f"Unexpected Error: {str(e)}")
+                response_placeholder.error(f"❌ Unexpected error: {str(e)}")
+                full_response = "Error: Please check your input and try again"
+                break
+
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
